@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Learning Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #E6F3FF;
+        }
+        nav {
+            background-color: #4180dd;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav-button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 5px;
+            background-color: #4180dd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .top-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background-color: #FFFACD;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .enlarged-text {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .control-button {
+            padding: 15px 30px;
+            margin: 0 10px;
+            font-size: 16px;
+            background-color: #90EE90;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #play-btn, #slow-play-btn {
+            background-color: #4180dd;
+            color: white;
+        }
+        .bottom-section {
+            flex: 2;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        tr.active {
+            background-color: #f0f0f0;
+        }
+        .select-btn {
+            padding: 5px 10px;
+            background-color: #4180dd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#page1" class="nav-button">Page 1</a>
+        <a href="#page2" class="nav-button">Page 2</a>
+        <a href="#page3" class="nav-button">Page 3</a>
+        <a href="#page4" class="nav-button">Page 4</a>
+        <a href="#page5" class="nav-button">Page 5</a>
+        <a href="#page6" class="nav-button">Page 6</a>
+        <a href="#page7" class="nav-button">Page 7</a>
+        <a href="#page8" class="nav-button">Page 8</a>
+        <a href="#page9" class="nav-button">Page 9</a>
+        <a href="#page10" class="nav-button">Page 10</a>
+    </nav>
+
+    <div class="top-section">
+        <div class="enlarged-text">
+            <div id="french-text"></div>
+            <div id="phonetic-text"></div>
+            <div id="chinese-text"></div>
+        </div>
+        <div class="controls">
+            <button id="prev-btn" class="control-button">上一句</button>
+            <button id="play-btn" class="control-button">正常读音</button>
+            <button id="slow-play-btn" class="control-button">慢读音</button>
+            <button id="next-btn" class="control-button">下一句</button>
+        </div>
+    </div>
+
+    <div class="bottom-section">
+        <table id="data-table">
+            <tr>
+                <th>French</th>
+                <th>Chinese</th>
+                <th>Phonetic</th>
+                <th>选择</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        data = [
+            ["Les sons", "发音", "[le sɔ̃]"],
+            ["2- Écrire", "2- 书写", "[e.kʁiʁ]"],
+            ["3- Compter", "3- 数数", "[kɔ̃.te]"],
+            ["4- Le temps", "4- 时间", "[lə tɑ̃]"],
+            ["L’heure", "时间，钟点", "[lœʁ]"],
+            ["L’alphabet L'Alphabet", "字母表", "/lal.fa.bɛ/ /lal.fo.bɛ/"],
+            ["aller à la patinoire", "去溜冰场", "[ale a la patinwaʁ]"],
+            ["Le cahier du débutant", "初学者笔记本1", "[lə ka.je dy de.by.tɑ̃]"],
+            ["Jouer et sortir", "玩耍和外出", "[ʒwe e sɔʁtiʁ]"],
+            ["jouer au cerf-volant", "放风筝", "[ʒwe o sɛʁvɔlɑ̃]"],
+            ["Regarder la télé (télévision)", "看电视", "[ʁəɡaʁde la tele]"],
+            ["jouer à des jeux de société", "玩桌游", "[ʒwe a de ʒø də sɔsjete]"],
+            ["jouer aux cartes", "打牌", "[ʒwe o kaʁt]"],
+            ["jouer à cache-cache", "玩捉迷藏", "[ʒwe a kaʃkaʃ]"],
+            ["lire des BD", "看漫画", "[liʁ de be de]"],
+            ["peindre", "画画", "[pɛ̃dʁ]"],
+            ["dessiner", "绘画", "[desine]"],
+            ["écouter de la musique", "听音乐", "[ekute də la myzik]"],
+            ["jouer sur l'ordinateur", "玩电脑", "[ʒwe syʁ lɔʁdinateur]"]
+        ];
+
+        let currentIndex = 0;
+        let synth = window.speechSynthesis;
+
+        function updateDisplay() {
+            document.getElementById('french-text').textContent = data[currentIndex][0];
+            document.getElementById('chinese-text').textContent = data[currentIndex][1];
+            document.getElementById('phonetic-text').textContent = data[currentIndex][2];
+
+            const rows = document.querySelectorAll('#data-table tr');
+            rows.forEach((row, index) => {
+                if (index === currentIndex + 1) {
+                    row.classList.add('active');
+                } else {
+                    row.classList.remove('active');
+                }
+            });
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentIndex < data.length - 1) {
+                currentIndex++;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('play-btn').addEventListener('click', () => {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            let utterance = new SpeechSynthesisUtterance(data[currentIndex][0]);
+            utterance.lang = 'fr-FR';
+            synth.speak(utterance);
+        });
+
+        document.getElementById('slow-play-btn').addEventListener('click', () => {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            let utterance = new SpeechSynthesisUtterance(data[currentIndex][0]);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.5;
+            synth.speak(utterance);
+        });
+
+        const tableBody = document.getElementById('data-table');
+        data.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            row.forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            const selectTd = document.createElement('td');
+            const selectBtn = document.createElement('button');
+            selectBtn.textContent = '选择';
+            selectBtn.className = 'select-btn';
+            selectBtn.addEventListener('click', () => {
+                currentIndex = index;
+                updateDisplay();
+            });
+            selectTd.appendChild(selectBtn);
+            tr.appendChild(selectTd);
+            tableBody.appendChild(tr);
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
